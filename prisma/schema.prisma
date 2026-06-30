@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("ANALYST")
+  createdAt DateTime @default(now())
+
+  feedbacks Feedback[]
+}
+
+model Feedback {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  sentiment   String?
+  status      String   @default("NEW")
+  createdAt   DateTime @default(now())
+
+  userId String
+  user   User @relation(fields: [userId], references: [id])
+}
