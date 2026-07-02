@@ -1,16 +1,17 @@
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-import { ReactNode } from "react";
+import Link from "next/link";
+import { Sparkles } from "lucide-react";
 
-interface PrimaryButtonProps {
-  children: ReactNode;
-}
-
-export default function PrimaryButton({ children }: PrimaryButtonProps) {
+export default function Logo() {
   return (
-    <Button className="rounded-xl bg-blue-600 px-6 py-6 text-base font-semibold text-white transition-all hover:scale-105 hover:bg-blue-700">
-      {children}
-      <ArrowRight className="ml-2 h-5 w-5" />
-    </Button>
+    <Link href="/" className="flex items-center gap-3">
+      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 via-violet-600 to-cyan-400 shadow-lg shadow-blue-500/25">
+        <Sparkles className="h-6 w-6 text-white" />
+      </div>
+
+      <div className="hidden sm:block">
+        <p className="text-xl font-bold tracking-tight text-white">LOOP</p>
+        <p className="text-xs text-slate-400">AI Feedback Intelligence</p>
+      </div>
+    </Link>
   );
 }
