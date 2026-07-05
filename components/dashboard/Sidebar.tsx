@@ -16,7 +16,7 @@ const menu = [
   { name: "Feedback", icon: MessageSquare, href: "/feedback" },
   { name: "Analytics", icon: BarChart3, href: "/analytics" },
   {name: "AI Assistant", icon: Bot, href: "/ai-assistant" },
-  { name: "Reports", icon: FileText, href: "#" },
+  {name: "Reports", icon: FileText, href: "/reports" },
   { name: "Settings", icon: Settings, href: "#" },
 ];
 
