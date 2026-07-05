@@ -1,3 +1,4 @@
+import ActivityTimeline from "./ActivityTimeline";
 import FeedbackTable from "./FeedbackTable";
 import AnalyticsChart from "./AnalyticsChart";
 
@@ -40,6 +41,7 @@ export default function DashboardLayout() {
         </div>
       </div>
 
+      <ActivityTimeline />
       <FeedbackTable />
     </section>
   );
