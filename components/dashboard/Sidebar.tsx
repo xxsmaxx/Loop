@@ -15,7 +15,7 @@ const menu = [
   { name: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
   { name: "Feedback", icon: MessageSquare, href: "/feedback" },
   { name: "Analytics", icon: BarChart3, href: "/analytics" },
-  { name: "AI Assistant", icon: Bot, href: "#" },
+  {name: "AI Assistant", icon: Bot, href: "/ai-assistant" },
   { name: "Reports", icon: FileText, href: "#" },
   { name: "Settings", icon: Settings, href: "#" },
 ];
