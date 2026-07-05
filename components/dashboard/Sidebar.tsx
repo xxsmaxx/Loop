@@ -17,7 +17,7 @@ const menu = [
   { name: "Analytics", icon: BarChart3, href: "/analytics" },
   {name: "AI Assistant", icon: Bot, href: "/ai-assistant" },
   {name: "Reports", icon: FileText, href: "/reports" },
-  { name: "Settings", icon: Settings, href: "#" },
+  {name: "Settings", icon: Settings, href: "/settings" },
 ];
 
 export default function Sidebar() {
