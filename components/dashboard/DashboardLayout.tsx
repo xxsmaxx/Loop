@@ -1,4 +1,5 @@
 import FeedbackTable from "./FeedbackTable";
+import AnalyticsChart from "./AnalyticsChart";
 
 export default function DashboardLayout() {
   const stats = [
@@ -22,13 +23,8 @@ export default function DashboardLayout() {
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
-        <div className="rounded-2xl border border-white/10 bg-[#111827] p-6 lg:col-span-2">
-          <h2 className="text-xl font-bold text-white">Feedback Analytics</h2>
-          <div className="mt-8 flex h-72 items-end gap-4">
-            {[45, 70, 55, 90, 65, 120, 85, 140, 95, 160].map((item, index) => (
-              <div key={index} className="flex-1 rounded-t-xl bg-gradient-to-t from-blue-700 via-blue-500 to-cyan-400" style={{ height: `${item}px` }} />
-            ))}
-          </div>
+        <div className="lg:col-span-2">
+          <AnalyticsChart />
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-[#111827] p-6">
@@ -36,7 +32,6 @@ export default function DashboardLayout() {
           <p className="mt-4 text-sm leading-6 text-slate-300">
             Customers are talking more about onboarding speed, payment reliability, and dashboard performance this week.
           </p>
-
           <div className="mt-6 space-y-3">
             <div className="rounded-xl bg-slate-950 p-3 text-sm text-slate-300">Payment issues increased by 23%</div>
             <div className="rounded-xl bg-slate-950 p-3 text-sm text-slate-300">Dashboard feedback is positive</div>
