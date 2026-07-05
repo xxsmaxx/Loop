@@ -1,9 +1,15 @@
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
+import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import Sidebar from "../../components/dashboard/Sidebar";
+import TopBar from "../../components/dashboard/TopBar";
 
 export default function DashboardPage() {
   return (
-    <main className="min-h-screen bg-[#020617] px-6 py-10 text-white">
-      <div className="mx-auto max-w-7xl">
+    <main className="flex min-h-screen bg-[#020617] text-white">
+      <Sidebar />
+
+      <section className="flex-1 px-8 py-8">
+        <TopBar />
+
         <p className="text-sm text-blue-400">LOOP Dashboard</p>
 
         <h1 className="mt-2 text-4xl font-bold">
@@ -15,7 +21,7 @@ export default function DashboardPage() {
         </p>
 
         <DashboardLayout />
-      </div>
+      </section>
     </main>
   );
 }
