@@ -1,3 +1,4 @@
+import SentimentPieChart from "./SentimentPieChart";
 import AIChatPanel from "./AIChatPanel";
 import ActivityTimeline from "./ActivityTimeline";
 import FeedbackTable from "./FeedbackTable";
@@ -44,6 +45,7 @@ export default function DashboardLayout() {
       <AIChatPanel />
       <ActivityTimeline />
       <FeedbackTable />
+      <SentimentPieChart />
       </section>
   );
 }
