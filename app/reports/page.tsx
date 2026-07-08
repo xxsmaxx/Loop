@@ -87,9 +87,12 @@ export default function ReportsPage() {
                     {item.status}
                   </span>
 
-                  <button className="rounded-xl bg-slate-800 p-3 hover:bg-blue-600">
+                  <a
+                   href="/api/reports/csv"
+                   className="rounded-xl bg-slate-800 p-3 hover:bg-blue-600"
+                   >
                     <Download className="h-4 w-4" />
-                  </button>
+                     </a>
                 </div>
               </div>
             ))}
