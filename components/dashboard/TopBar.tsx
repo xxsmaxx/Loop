@@ -1,10 +1,13 @@
 "use client";
 
-import { Bell, Search } from "lucide-react";
+import { Bell, LogOut, Search } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import ThemeToggle from "../shared/ThemeToggle";
 
 export default function TopBar() {
+  const router = useRouter();
+
   const [user, setUser] = useState({
     name: "User",
     role: "Admin",
@@ -13,15 +16,24 @@ export default function TopBar() {
   useEffect(() => {
     const savedUser = localStorage.getItem("loopUser");
 
-    if (savedUser) {
-      const parsedUser = JSON.parse(savedUser);
-
-      setUser({
-        name: parsedUser.name || "User",
-        role: parsedUser.role || "Admin",
-      });
+    if (!savedUser) {
+      router.push("/login");
+      return;
     }
-  }, []);
+
+    const parsedUser = JSON.parse(savedUser);
+
+    setUser({
+      name: parsedUser.name || "User",
+      role: parsedUser.role || "Admin",
+    });
+  }, [router]);
+
+  function handleLogout() {
+    localStorage.removeItem("loopUser");
+    localStorage.removeItem("loopToken");
+    router.push("/login");
+  }
 
   return (
     <div className="mb-8 flex items-center justify-between rounded-2xl border border-white/10 bg-[#111827] px-6 py-4 shadow-lg">
@@ -40,6 +52,14 @@ export default function TopBar() {
         </button>
 
         <ThemeToggle />
+
+        <button
+          onClick={handleLogout}
+          className="rounded-xl bg-red-500/20 p-3 text-red-400 hover:bg-red-600 hover:text-white"
+          title="Logout"
+        >
+          <LogOut className="h-5 w-5" />
+        </button>
 
         <div className="flex items-center gap-3 rounded-xl bg-slate-800 px-4 py-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 font-bold">
