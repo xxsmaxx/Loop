@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LOOP – Full Stack AI Customer Feedback Intelligence Platform
 
-## Getting Started
+LOOP is a full-stack AI-powered customer feedback intelligence platform built with Next.js, MongoDB, and Gemini AI.
 
-First, run the development server:
+## Features
 
-```bash
+- Modern SaaS landing page
+- Login and signup authentication
+- MongoDB database integration
+- Protected dashboard
+- Logout functionality
+- Feedback CRUD system
+- Add, view, edit, delete, and search feedback
+- Gemini AI Assistant
+- Dashboard AI chat
+- CSV report download
+- Dark and light theme toggle
+- Responsive dashboard UI
+
+## Tech Stack
+
+### Frontend
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- Lucide React
+- Recharts
+
+### Backend
+- Next.js API Routes
+- MongoDB
+- Mongoose
+- JWT
+- bcryptjs
+
+### AI
+- Google Gemini API
+
+## Environment Variables
+
+Create a `.env.local` file in the root folder:
+
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+GEMINI_API_KEY=your_gemini_api_key
+
+## How to Run Locally
+
+Install dependencies:
+
+npm install
+
+Run development server:
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+http://localhost:3000
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Build project:
 
-## Learn More
+npm run build
 
-To learn more about Next.js, take a look at the following resources:
+## Project Explanation
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+LOOP is a full-stack AI-powered customer feedback intelligence platform. It allows users to sign up, log in, manage feedback, analyze customer issues using Gemini AI, download CSV reports, and switch between dark and light mode.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Interview Explanation
 
-## Deploy on Vercel
+I built LOOP using Next.js, React, TypeScript, Tailwind CSS, MongoDB, and Gemini AI. I implemented real authentication, protected dashboard, feedback CRUD APIs, CSV report export, and AI-powered feedback analysis using Gemini API.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Future Scope
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- PDF report download
+- Role-based access control
+- Email notifications
+- Advanced analytics
+- Team collaboration
+- Vercel deployment
+
+## Author
+
+Built by Harsh Anand
