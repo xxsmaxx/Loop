@@ -1,7 +1,8 @@
 "use client";
 
-import { Bell, Search, Settings } from "lucide-react";
+import { Bell, Search } from "lucide-react";
 import { useEffect, useState } from "react";
+import ThemeToggle from "../shared/ThemeToggle";
 
 export default function TopBar() {
   const [user, setUser] = useState({
@@ -38,9 +39,7 @@ export default function TopBar() {
           <Bell className="h-5 w-5" />
         </button>
 
-        <button className="rounded-xl bg-slate-800 p-3 hover:bg-blue-600">
-          <Settings className="h-5 w-5" />
-        </button>
+        <ThemeToggle />
 
         <div className="flex items-center gap-3 rounded-xl bg-slate-800 px-4 py-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 font-bold">

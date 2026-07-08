@@ -128,3 +128,65 @@
     @apply font-sans;
   }
 }
+html.light {
+  color-scheme: light;
+}
+
+html.light body {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+html.light main,
+html.light aside,
+html.light section {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+html.light div:not([class*="gradient"]),
+html.light nav,
+html.light form,
+html.light table,
+html.light tr,
+html.light td,
+html.light th {
+  color: #0f172a !important;
+}
+
+html.light [class*="bg-[#111827]"],
+html.light [class*="bg-[#020617]"],
+html.light [class*="bg-slate-950"],
+html.light [class*="bg-slate-900"],
+html.light [class*="bg-slate-800"],
+html.light [class*="bg-white/[0.04]"] {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+html.light [class*="text-white"] {
+  color: #0f172a !important;
+}
+
+html.light [class*="text-slate-300"],
+html.light [class*="text-slate-400"],
+html.light [class*="text-slate-500"] {
+  color: #475569 !important;
+}
+
+html.light [class*="border-white/10"],
+html.light [class*="border-slate-700"],
+html.light [class*="border-slate-800"] {
+  border-color: #e2e8f0 !important;
+}
+
+html.light input,
+html.light select {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.light input::placeholder {
+  color: #64748b !important;
+}
