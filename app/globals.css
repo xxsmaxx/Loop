@@ -4,25 +4,17 @@
   box-sizing: border-box;
 }
 
-html {
-  background: #020617;
-  color-scheme: dark;
-}
-
+html,
 body {
   margin: 0;
-  min-height: 100vh;
+  min-height: 100%;
   overflow-x: hidden;
   background: #020617;
   color: #ffffff;
 }
 
-/* ===== LIGHT THEME ===== */
-html.light {
-  color-scheme: light;
-  background: #f8fafc;
-}
-
+/* ===== Light Theme ===== */
+html.light,
 html.light body {
   background: #f8fafc !important;
   color: #0f172a !important;
@@ -61,240 +53,93 @@ html.light textarea {
   border-color: #cbd5e1 !important;
 }
 
-/* ===== MOBILE DASHBOARD CLEAN FIX ===== */
+/* ===== Clean Mobile Fix ===== */
 @media (max-width: 768px) {
   html,
   body {
-    width: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
     background: #020617 !important;
   }
 
-  /* Hide sidebar on mobile */
+  /* Mobile me sidebar hide */
   aside {
     display: none !important;
   }
 
-  /* Main full width */
   main {
     width: 100% !important;
     max-width: 100% !important;
-    min-width: 0 !important;
     margin: 0 !important;
-    padding: 14px !important;
+    padding: 16px !important;
     overflow-x: hidden !important;
     background: #020617 !important;
   }
 
   main > div,
-  main section,
-  main form {
-    width: 100% !important;
+  main section {
     max-width: 100% !important;
-    min-width: 0 !important;
   }
 
-  /* Top bar */
-  [class*="mb-8"][class*="flex"][class*="justify-between"] {
-    width: 100% !important;
-    max-width: 100% !important;
+  /* Topbar clean mobile */
+  main > div[class*="mb-8"][class*="justify-between"] {
     display: flex !important;
-    flex-direction: column !important;
-    align-items: stretch !important;
-    gap: 12px !important;
-    padding: 14px !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 10px !important;
+    overflow-x: auto !important;
   }
 
-  [class*="w-[420px]"] {
-    width: 100% !important;
-    max-width: 100% !important;
+  main > div[class*="mb-8"] [class*="w-[420px]"] {
+    width: 180px !important;
+    min-width: 180px !important;
+    max-width: 180px !important;
   }
 
-  [class*="items-center"][class*="gap-4"] {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 10px !important;
+  main > div[class*="mb-8"] button {
+    width: auto !important;
+    min-width: 44px !important;
+    height: 44px !important;
   }
 
-  /* Headings */
+  main > div[class*="mb-8"] [class*="rounded-full"] {
+    min-width: 40px !important;
+  }
+
   h1 {
-    font-size: 28px !important;
-    line-height: 36px !important;
+    font-size: 30px !important;
+    line-height: 38px !important;
   }
 
   h2 {
-    font-size: 21px !important;
+    font-size: 22px !important;
     line-height: 30px !important;
   }
 
   p {
-    font-size: 14px !important;
     line-height: 22px !important;
   }
 
-  /* Cards */
-  [class*="rounded-2xl"] {
-    max-width: 100% !important;
-    border-radius: 18px !important;
-  }
-
   [class*="p-6"] {
-    padding: 18px !important;
+    padding: 16px !important;
   }
 
-  /* Form */
-  form {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 14px !important;
-  }
-
-  input,
-  select,
-  textarea,
-  button {
+  form input,
+  form select,
+  form textarea,
+  form button {
     width: 100% !important;
-    max-width: 100% !important;
-    font-size: 15px !important;
   }
 
   textarea {
     min-height: 130px !important;
   }
 
-  /* Feedback table becomes mobile cards */
-  table {
-    width: 100% !important;
-    min-width: 0 !important;
-    border-collapse: separate !important;
-    border-spacing: 0 12px !important;
-  }
-
-  thead {
-    display: none !important;
-  }
-
-  tbody,
-  tr,
-  td {
-    display: block !important;
-    width: 100% !important;
-  }
-
-  tr {
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    border-radius: 16px !important;
-    background: #0f172a !important;
-    padding: 14px !important;
-    margin-bottom: 14px !important;
-  }
-
-  td {
-    border: none !important;
-    padding: 8px 0 !important;
-    font-size: 14px !important;
-    line-height: 22px !important;
-    color: #cbd5e1 !important;
-    white-space: normal !important;
-    word-break: break-word !important;
-  }
-
-  td:nth-child(1)::before {
-    content: "Company: ";
-    font-weight: 700;
-    color: #ffffff;
-  }
-
-  td:nth-child(2)::before {
-    content: "Customer: ";
-    font-weight: 700;
-    color: #ffffff;
-  }
-
-  td:nth-child(3)::before {
-    content: "Feedback: ";
-    font-weight: 700;
-    color: #ffffff;
-  }
-
-  td:nth-child(4)::before {
-    content: "Sentiment: ";
-    font-weight: 700;
-    color: #ffffff;
-  }
-
-  td:nth-child(5)::before {
-    content: "Status: ";
-    font-weight: 700;
-    color: #ffffff;
-  }
-
-  td:nth-child(6)::before {
-    content: "Action: ";
-    font-weight: 700;
-    color: #ffffff;
-  }
-
+  /* Mobile feedback card layout */
   .overflow-x-auto {
-    overflow-x: visible !important;
-  }
-}
-
-/* ===== MOBILE SIDEBAR AS BOTTOM NAV ===== */
-@media (max-width: 768px) {
-  aside {
-    display: flex !important;
-    position: fixed !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    top: auto !important;
-    width: 100% !important;
-    height: 74px !important;
-    z-index: 9999 !important;
-    padding: 8px !important;
-    background: #020617 !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
     overflow-x: auto !important;
-    overflow-y: hidden !important;
-  }
-
-  aside > div {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 8px !important;
-    width: max-content !important;
-  }
-
-  aside a,
-  aside button {
-    min-width: 82px !important;
-    height: 56px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 4px !important;
-    padding: 8px !important;
-    border-radius: 14px !important;
-    font-size: 11px !important;
-    white-space: nowrap !important;
-  }
-
-  aside h1,
-  aside h2,
-  aside p {
-    display: none !important;
-  }
-
-  aside span {
-    font-size: 11px !important;
-    line-height: 14px !important;
-  }
-
-  main {
-    padding-bottom: 92px !important;
+    -webkit-overflow-scrolling: touch !important;
   }
 }
