@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit, Plus, Search, Trash2, X } from "lucide-react";
+import { Edit, Eye, Plus, Search, Trash2, X } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
 type FeedbackItem = {
@@ -29,6 +29,8 @@ export default function FeedbackTable() {
   const [search, setSearch] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
+  const [selectedFeedback, setSelectedFeedback] = useState<FeedbackItem | null>(null);
+
   const [user, setUser] = useState({
     name: "User",
     email: "",
@@ -194,7 +196,10 @@ export default function FeedbackTable() {
               {editingId ? "Edit Feedback" : "Add Feedback"}
             </h2>
             <p className="text-sm text-slate-400">
-              Logged in as {user.role}. {isAdmin ? "Admin can edit and delete feedback." : "User can only add and view feedback."}
+              Logged in as {user.role}.{" "}
+              {isAdmin
+                ? "Admin can view, edit and delete feedback."
+                : "User can add, view and search feedback."}
             </p>
           </div>
 
@@ -275,7 +280,9 @@ export default function FeedbackTable() {
           <div>
             <h2 className="text-xl font-bold text-white">Feedback Records</h2>
             <p className="text-sm text-slate-400">
-              {isAdmin ? "Admin mode: edit/delete enabled." : "User mode: edit/delete disabled."}
+              {isAdmin
+                ? "Admin mode: view/edit/delete enabled."
+                : "User mode: view only. Edit/delete disabled."}
             </p>
           </div>
 
@@ -290,7 +297,7 @@ export default function FeedbackTable() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="hidden overflow-x-auto md:block">
           <table className="w-full min-w-[900px] text-left text-sm">
             <thead>
               <tr className="border-b border-white/10 text-slate-400">
@@ -312,29 +319,35 @@ export default function FeedbackTable() {
                   <td className="py-4">{item.sentiment}</td>
                   <td className="py-4">{item.status}</td>
                   <td className="py-4">
-                    {isAdmin ? (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => startEdit(item)}
-                          className="rounded-lg bg-yellow-500/20 p-2 text-yellow-300 hover:bg-yellow-500 hover:text-white"
-                          title="Edit"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setSelectedFeedback(item)}
+                        className="rounded-lg bg-blue-500/20 p-2 text-blue-300 hover:bg-blue-500 hover:text-white"
+                        title="View"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </button>
 
-                        <button
-                          onClick={() => handleDelete(item._id)}
-                          className="rounded-lg bg-red-500/20 p-2 text-red-300 hover:bg-red-500 hover:text-white"
-                          title="Delete"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    ) : (
-                      <span className="rounded-lg bg-slate-800 px-3 py-2 text-xs text-slate-400">
-                        View only
-                      </span>
-                    )}
+                      {isAdmin && (
+                        <>
+                          <button
+                            onClick={() => startEdit(item)}
+                            className="rounded-lg bg-yellow-500/20 p-2 text-yellow-300 hover:bg-yellow-500 hover:text-white"
+                            title="Edit"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </button>
+
+                          <button
+                            onClick={() => handleDelete(item._id)}
+                            className="rounded-lg bg-red-500/20 p-2 text-red-300 hover:bg-red-500 hover:text-white"
+                            title="Delete"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -349,7 +362,115 @@ export default function FeedbackTable() {
             </tbody>
           </table>
         </div>
+
+        <div className="space-y-4 md:hidden">
+          {filteredFeedbacks.map((item) => (
+            <div
+              key={item._id}
+              className="rounded-2xl border border-white/10 bg-slate-950 p-4"
+            >
+              <div className="mb-3 flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="font-bold text-white">{item.company}</h3>
+                  <p className="text-sm text-slate-400">{item.customer}</p>
+                </div>
+
+                <span className="rounded-full bg-blue-500/20 px-3 py-1 text-xs text-blue-300">
+                  {item.status}
+                </span>
+              </div>
+
+              <p className="mb-3 text-sm leading-6 text-slate-300">
+                {item.feedback}
+              </p>
+
+              <p className="mb-4 text-sm text-slate-400">
+                Sentiment: <span className="text-white">{item.sentiment}</span>
+              </p>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setSelectedFeedback(item)}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white"
+                >
+                  <Eye className="h-4 w-4" />
+                  View
+                </button>
+
+                {isAdmin && (
+                  <>
+                    <button
+                      onClick={() => startEdit(item)}
+                      className="rounded-xl bg-yellow-500/20 px-4 py-3 text-yellow-300"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </button>
+
+                    <button
+                      onClick={() => handleDelete(item._id)}
+                      className="rounded-xl bg-red-500/20 px-4 py-3 text-red-300"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
+
+      {selectedFeedback && (
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#111827] p-6 shadow-2xl">
+            <div className="mb-4 flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-bold text-white">
+                  Feedback Details
+                </h2>
+                <p className="text-sm text-slate-400">
+                  Full customer feedback information
+                </p>
+              </div>
+
+              <button
+                onClick={() => setSelectedFeedback(null)}
+                className="rounded-xl bg-slate-800 p-2 text-white hover:bg-red-500"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-sm">
+              <p className="text-slate-400">
+                Company: <span className="text-white">{selectedFeedback.company}</span>
+              </p>
+              <p className="text-slate-400">
+                Customer: <span className="text-white">{selectedFeedback.customer}</span>
+              </p>
+              <p className="text-slate-400">
+                Sentiment: <span className="text-white">{selectedFeedback.sentiment}</span>
+              </p>
+              <p className="text-slate-400">
+                Status: <span className="text-white">{selectedFeedback.status}</span>
+              </p>
+              <div>
+                <p className="mb-2 text-slate-400">Feedback:</p>
+                <p className="rounded-xl bg-slate-950 p-4 leading-6 text-white">
+                  {selectedFeedback.feedback}
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setSelectedFeedback(null)}
+              className="mt-6 w-full rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-500"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
