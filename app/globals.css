@@ -190,3 +190,58 @@ html.light select {
 html.light input::placeholder {
   color: #64748b !important;
 }
+/* ===== Mobile Deploy Theme Fix ===== */
+
+html,
+body {
+  background: #020617 !important;
+  color: #ffffff !important;
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+html:not(.light) body,
+html:not(.light) main,
+html:not(.light) section {
+  background: #020617 !important;
+  color: #ffffff !important;
+}
+
+html:not(.light) [class*="bg-white"] {
+  background: #111827 !important;
+  color: #ffffff !important;
+}
+
+html.light body,
+html.light main,
+html.light section {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+html.light [class*="bg-[#111827]"],
+html.light [class*="bg-[#020617]"],
+html.light [class*="bg-slate-950"],
+html.light [class*="bg-slate-900"],
+html.light [class*="bg-slate-800"],
+html.light [class*="bg-white"] {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+html.light [class*="text-white"] {
+  color: #0f172a !important;
+}
+
+html.light [class*="text-slate-300"],
+html.light [class*="text-slate-400"],
+html.light [class*="text-slate-500"] {
+  color: #475569 !important;
+}
+
+html.light input,
+html.light select,
+html.light textarea {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}

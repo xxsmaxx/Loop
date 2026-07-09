@@ -1,11 +1,5 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI as string;
-
-if (!MONGODB_URI) {
-  throw new Error("MONGODB_URI missing in .env.local");
-}
-
 let cached = (global as any).mongoose;
 
 if (!cached) {
@@ -17,22 +11,28 @@ if (!cached) {
 
 export async function connectDB() {
   try {
+    const mongoUri = process.env.MONGODB_URI || process.env.DB_URI;
+
+    if (!mongoUri) {
+      throw new Error("MongoDB URI missing. Add MONGODB_URI in Vercel Environment Variables.");
+    }
+
     if (cached.conn) return cached.conn;
 
     if (!cached.promise) {
-      cached.promise = mongoose.connect(MONGODB_URI, {
+      cached.promise = mongoose.connect(mongoUri, {
         serverSelectionTimeoutMS: 5000,
         connectTimeoutMS: 5000,
       });
     }
 
     cached.conn = await cached.promise;
-    console.log("MongoDB Connected ✅");
+    console.log("MongoDB Connected");
     return cached.conn;
   } catch (error) {
     cached.promise = null;
     cached.conn = null;
-    console.log("MongoDB Connection Error ❌", error);
+    console.log("MongoDB Connection Error", error);
     throw error;
   }
 }
