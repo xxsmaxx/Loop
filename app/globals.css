@@ -4,25 +4,44 @@
   box-sizing: border-box;
 }
 
-html,
+html {
+  background: #020617;
+  color-scheme: dark;
+}
+
 body {
   margin: 0;
-  min-height: 100%;
-  overflow-x: hidden;
+  min-height: 100vh;
   background: #020617;
   color: #ffffff;
+  overflow-x: hidden;
 }
 
 /* ===== Light Theme ===== */
-html.light,
+
+html.light {
+  color-scheme: light;
+}
+
 html.light body {
   background: #f8fafc !important;
   color: #0f172a !important;
 }
 
 html.light main,
+html.light aside,
 html.light section {
   background: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+html.light div:not([class*="gradient"]),
+html.light nav,
+html.light form,
+html.light table,
+html.light tr,
+html.light td,
+html.light th {
   color: #0f172a !important;
 }
 
@@ -30,7 +49,8 @@ html.light [class*="bg-[#111827]"],
 html.light [class*="bg-[#020617]"],
 html.light [class*="bg-slate-950"],
 html.light [class*="bg-slate-900"],
-html.light [class*="bg-slate-800"] {
+html.light [class*="bg-slate-800"],
+html.light [class*="bg-white/[0.04]"] {
   background: #ffffff !important;
   color: #0f172a !important;
 }
@@ -45,6 +65,12 @@ html.light [class*="text-slate-500"] {
   color: #475569 !important;
 }
 
+html.light [class*="border-white/10"],
+html.light [class*="border-slate-700"],
+html.light [class*="border-slate-800"] {
+  border-color: #e2e8f0 !important;
+}
+
 html.light input,
 html.light select,
 html.light textarea {
@@ -53,93 +79,7 @@ html.light textarea {
   border-color: #cbd5e1 !important;
 }
 
-/* ===== Clean Mobile Fix ===== */
-@media (max-width: 768px) {
-  html,
-  body {
-    width: 100% !important;
-    max-width: 100% !important;
-    overflow-x: hidden !important;
-    background: #020617 !important;
-  }
-
-  /* Mobile me sidebar hide */
-  aside {
-    display: none !important;
-  }
-
-  main {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    padding: 16px !important;
-    overflow-x: hidden !important;
-    background: #020617 !important;
-  }
-
-  main > div,
-  main section {
-    max-width: 100% !important;
-  }
-
-  /* Topbar clean mobile */
-  main > div[class*="mb-8"][class*="justify-between"] {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 8px !important;
-    padding: 10px !important;
-    overflow-x: auto !important;
-  }
-
-  main > div[class*="mb-8"] [class*="w-[420px]"] {
-    width: 180px !important;
-    min-width: 180px !important;
-    max-width: 180px !important;
-  }
-
-  main > div[class*="mb-8"] button {
-    width: auto !important;
-    min-width: 44px !important;
-    height: 44px !important;
-  }
-
-  main > div[class*="mb-8"] [class*="rounded-full"] {
-    min-width: 40px !important;
-  }
-
-  h1 {
-    font-size: 30px !important;
-    line-height: 38px !important;
-  }
-
-  h2 {
-    font-size: 22px !important;
-    line-height: 30px !important;
-  }
-
-  p {
-    line-height: 22px !important;
-  }
-
-  [class*="p-6"] {
-    padding: 16px !important;
-  }
-
-  form input,
-  form select,
-  form textarea,
-  form button {
-    width: 100% !important;
-  }
-
-  textarea {
-    min-height: 130px !important;
-  }
-
-  /* Mobile feedback card layout */
-  .overflow-x-auto {
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #64748b !important;
 }
