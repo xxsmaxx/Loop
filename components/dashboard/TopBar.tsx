@@ -36,8 +36,8 @@ export default function TopBar() {
   }
 
   return (
-    <div className="mb-8 flex items-center justify-between rounded-2xl border border-white/10 bg-[#111827] px-6 py-4 shadow-lg">
-      <div className="flex w-[420px] items-center gap-3 rounded-xl border border-slate-700 bg-[#020617] px-4 py-3">
+    <div className="mb-8 flex flex-col gap-4 rounded-2xl border border-white/10 bg-[#111827] px-4 py-4 shadow-lg lg:flex-row lg:items-center lg:justify-between lg:px-6">
+      <div className="flex w-full items-center gap-3 rounded-xl border border-slate-700 bg-[#020617] px-4 py-3 lg:w-[420px]">
         <Search className="h-5 w-5 text-slate-400" />
 
         <input
@@ -46,7 +46,7 @@ export default function TopBar() {
         />
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center gap-3">
         <button className="rounded-xl bg-slate-800 p-3 hover:bg-blue-600">
           <Bell className="h-5 w-5" />
         </button>
