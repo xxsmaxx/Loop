@@ -8,6 +8,7 @@ import {
   Plus,
   RefreshCw,
   Search,
+  Sparkles,
   Trash2,
 } from "lucide-react";
 import { getSession } from "next-auth/react";
@@ -47,6 +48,8 @@ export default function FeedbackTable() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [classifyingId, setClassifyingId] = useState("");
+  const [classifyingPending, setClassifyingPending] = useState(false);
 
   const [content, setContent] = useState("");
   const [customerLabel, setCustomerLabel] = useState("");
@@ -232,6 +235,78 @@ export default function FeedbackTable() {
     }
   }
 
+  async function classifyOneFeedback(id: string) {
+    setMessage("");
+
+    if (!canManage) {
+      setMessage("Viewer role is read-only. Only Admin or Analyst can run AI classification.");
+      return;
+    }
+
+    try {
+      setClassifyingId(id);
+
+      const res = await fetch(`/api/feedback/${id}/classify`, {
+        method: "POST",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setMessage(data.message || "AI classification failed.");
+        return;
+      }
+
+      setMessage(
+        `AI classified: ${data.classification?.sentiment || "Done"} | ${data.classification?.featureArea || "Feature area updated"}`
+      );
+
+      fetchFeedbacks();
+    } catch {
+      setMessage("AI classification failed.");
+    } finally {
+      setClassifyingId("");
+    }
+  }
+
+  async function classifyPendingFeedback() {
+    setMessage("");
+
+    if (!canManage) {
+      setMessage("Viewer role is read-only. Only Admin or Analyst can run AI classification.");
+      return;
+    }
+
+    try {
+      setClassifyingPending(true);
+
+      const res = await fetch("/api/feedback/classify-pending", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ limit: 10 }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setMessage(data.message || "Pending AI classification failed.");
+        return;
+      }
+
+      setMessage(
+        `AI classification completed. Total: ${data.total || 0}, Classified: ${data.classified || 0}, Failed: ${data.failed || 0}.`
+      );
+
+      fetchFeedbacks();
+    } catch {
+      setMessage("Pending AI classification failed.");
+    } finally {
+      setClassifyingPending(false);
+    }
+  }
+
   async function updateStatus(id: string, status: Status) {
     if (!canManage) {
       setMessage("Viewer role is read-only. Only Admin or Analyst can update status.");
@@ -305,8 +380,14 @@ export default function FeedbackTable() {
   }
 
   const roleText = useMemo(() => {
-    if (role === "ADMIN") return "Admin can add, import, update status, and delete feedback.";
-    if (role === "ANALYST") return "Analyst can add, import, and update status.";
+    if (role === "ADMIN") {
+      return "Admin can add, import, classify, update status, and delete feedback.";
+    }
+
+    if (role === "ANALYST") {
+      return "Analyst can add, import, classify, and update status.";
+    }
+
     return "Viewer can only read feedback.";
   }, [role]);
 
@@ -377,13 +458,13 @@ export default function FeedbackTable() {
 
       <section className="rounded-2xl border border-white/10 bg-[#111827] p-6">
         <div className="mb-5">
-          <h2 className="text-2xl font-bold text-white">Bulk Import & Simulated Source</h2>
+          <h2 className="text-2xl font-bold text-white">Bulk Import, Source & AI</h2>
           <p className="mt-1 text-sm text-slate-400">
-            Upload CSV or pull demo feedback from a simulated channel source.
+            Upload CSV, pull demo feedback, or classify pending feedback with AI.
           </p>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid gap-4 xl:grid-cols-3">
           <form
             onSubmit={handleCsvUpload}
             className="rounded-2xl border border-white/10 bg-slate-950 p-5"
@@ -434,6 +515,26 @@ export default function FeedbackTable() {
               {importing ? "Importing..." : "Pull Simulated Feedback"}
             </button>
           </div>
+
+          <div className="rounded-2xl border border-white/10 bg-slate-950 p-5">
+            <div className="mb-4 flex items-center gap-3">
+              <Sparkles className="h-5 w-5 text-yellow-300" />
+              <div>
+                <h3 className="font-semibold text-white">AI Classification</h3>
+                <p className="text-xs text-slate-400">
+                  Classify 10 pending feedback items using Claude/fallback AI.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={classifyPendingFeedback}
+              disabled={!canManage || classifyingPending}
+              className="w-full rounded-xl bg-yellow-500 px-5 py-3 font-semibold text-slate-950 hover:bg-yellow-400 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {classifyingPending ? "Classifying..." : "Classify Pending"}
+            </button>
+          </div>
         </div>
       </section>
 
@@ -441,7 +542,7 @@ export default function FeedbackTable() {
         <div className="mb-5">
           <h2 className="text-2xl font-bold text-white">Feedback Inbox</h2>
           <p className="mt-1 text-sm text-slate-400">
-            Search, filter, paginate, and triage feedback.
+            Search, filter, paginate, classify, and triage feedback.
           </p>
         </div>
 
@@ -509,7 +610,7 @@ export default function FeedbackTable() {
         </form>
 
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[1050px] text-left text-sm">
+          <table className="w-full min-w-[1150px] text-left text-sm">
             <thead>
               <tr className="border-b border-white/10 text-slate-400">
                 <th className="py-3">Customer</th>
@@ -564,14 +665,25 @@ export default function FeedbackTable() {
                         </select>
                       </td>
                       <td className="py-4">
-                        <button
-                          onClick={() => deleteFeedback(item.id)}
-                          disabled={!canDelete}
-                          className="rounded-lg bg-red-500/20 p-2 text-red-300 hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
-                          title="Only Admin can delete"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => classifyOneFeedback(item.id)}
+                            disabled={!canManage || classifyingId === item.id}
+                            className="rounded-lg bg-yellow-500/20 p-2 text-yellow-300 hover:bg-yellow-500 hover:text-slate-950 disabled:cursor-not-allowed disabled:opacity-40"
+                            title="Classify with AI"
+                          >
+                            <Sparkles className="h-4 w-4" />
+                          </button>
+
+                          <button
+                            onClick={() => deleteFeedback(item.id)}
+                            disabled={!canDelete}
+                            className="rounded-lg bg-red-500/20 p-2 text-red-300 hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                            title="Only Admin can delete"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
