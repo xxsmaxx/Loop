@@ -72,7 +72,7 @@ export async function POST(req: Request) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { message: "Invalid question.", errors: parsed.error.errors },
+        { message: "Invalid question.", errors: parsed.error.issues },
         { status: 400 }
       );
     }

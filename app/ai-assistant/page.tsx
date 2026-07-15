@@ -186,7 +186,7 @@ export default function AiAssistantPage() {
                   </div>
 
                   <p className="mb-2 text-sm font-semibold text-white">
-                    {source.customerLabel} · {source.featureArea}
+                    {source.customerLabel} Â· {source.featureArea}
                   </p>
 
                   <p className="line-clamp-4 text-sm leading-6 text-slate-400">
