@@ -1,57 +1,85 @@
-# LOOP – Full Stack AI Customer Feedback Intelligence Platform
+# Project LOOP - AI Customer Feedback Intelligence Platform
 
-LOOP is a full-stack AI-powered customer feedback intelligence platform built with Next.js, MongoDB, and Gemini AI.
-
-## Features
-
-- Modern SaaS landing page
-- Login and signup authentication
-- MongoDB database integration
-- Protected dashboard
-- Logout functionality
-- Feedback CRUD system
-- Add, view, edit, delete, and search feedback
-- Gemini AI Assistant
-- Dashboard AI chat
-- CSV report download
-- Dark and light theme toggle
-- Responsive dashboard UI
+Project LOOP is an AI-powered customer feedback intelligence platform built for the Zidio internship project.
 
 ## Tech Stack
 
-### Frontend
-- Next.js
-- React
+- Next.js 14
 - TypeScript
 - Tailwind CSS
-- Lucide React
+- PostgreSQL
+- Prisma ORM
+- NextAuth/Auth.js
+- Claude API / Anthropic SDK
+- Zod
 - Recharts
 
-### Backend
-- Next.js API Routes
-- MongoDB
-- Mongoose
-- JWT
-- bcryptjs
+## Features
 
-### AI
-- Google Gemini API
+- Workspace-based authentication
+- Signup creates workspace and ADMIN user
+- Role-based access control: ADMIN, ANALYST, VIEWER
+- Manual feedback entry
+- CSV bulk feedback upload
+- Simulated feedback channel source
+- Feedback inbox with search, filter, pagination
+- Status workflow: NEW, REVIEWED, ACTIONED
+- AI feedback classification
+- Sentiment, sentiment score, feature area and themes
+- Analytics dashboard with charts
+- Ask LOOP grounded Q&A with feedback sources
+- Voice of Customer report generation
+- Saved reports and TXT export
+
+## Demo Credentials
+
+Admin:
+admin@loop.com
+Password: Demo@123
+
+Analyst:
+analyst@loop.com
+Password: Demo@123
+
+Viewer:
+viewer@loop.com
+Password: Demo@123
 
 ## Environment Variables
 
-Create a `.env.local` file in the root folder:
+Create a .env file.
 
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-GEMINI_API_KEY=your_gemini_api_key
+Required variables:
 
-## How to Run Locally
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?sslmode=require"
+NEXTAUTH_SECRET="replace-with-secure-random-secret"
+NEXTAUTH_URL="http://localhost:3000"
+ANTHROPIC_API_KEY="demo_key"
+ANTHROPIC_MODEL="claude-haiku-4-5"
+
+Use demo_key for fallback AI demo mode.
+
+Never commit real API keys or database passwords.
+
+## Local Setup
 
 Install dependencies:
 
 npm install
 
-Run development server:
+Generate Prisma client:
+
+npx prisma generate
+
+Run migration:
+
+npx prisma migrate dev
+
+Seed demo data:
+
+npx tsx prisma/seed.ts
+
+Start development server:
 
 npm run dev
 
@@ -59,27 +87,43 @@ Open:
 
 http://localhost:3000
 
-Build project:
+## Build
 
 npm run build
 
-## Project Explanation
+## Deployment Notes
 
-LOOP is a full-stack AI-powered customer feedback intelligence platform. It allows users to sign up, log in, manage feedback, analyze customer issues using Gemini AI, download CSV reports, and switch between dark and light mode.
+Recommended:
 
-## Interview Explanation
+- Vercel for Next.js
+- Neon or Supabase for PostgreSQL
+- Add all environment variables in Vercel settings
+- Run production migration:
 
-I built LOOP using Next.js, React, TypeScript, Tailwind CSS, MongoDB, and Gemini AI. I implemented real authentication, protected dashboard, feedback CRUD APIs, CSV report export, and AI-powered feedback analysis using Gemini API.
+npx prisma migrate deploy
 
-## Future Scope
+## Security Notes
 
-- PDF report download
-- Role-based access control
-- Email notifications
-- Advanced analytics
-- Team collaboration
-- Vercel deployment
+- All feedback, analytics, reports, themes and Ask LOOP data are filtered by authenticated workspaceId.
+- RBAC is enforced server-side.
+- VIEWER role is read-only.
+- Claude API key is used only on server-side.
+- Real secrets must not be pushed to GitHub.
 
-## Author
+## Submission Checklist
 
-Built by Harsh Anand
+- Next.js 14 + TypeScript
+- PostgreSQL + Prisma
+- NextAuth authentication
+- RBAC roles
+- Seeded demo workspace
+- 120+ feedback records
+- Feedback inbox
+- CSV import
+- Simulated channel source
+- Analytics charts
+- AI classification
+- Ask LOOP Q&A
+- VoC report generation
+- README and setup instructions
+- No secrets committed
