@@ -1,6 +1,15 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Plus, RefreshCw, Search, Trash2 } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Database,
+  FileUp,
+  Plus,
+  RefreshCw,
+  Search,
+  Trash2,
+} from "lucide-react";
 import { getSession } from "next-auth/react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
@@ -37,10 +46,12 @@ export default function FeedbackTable() {
   const [role, setRole] = useState<Role>("VIEWER");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [importing, setImporting] = useState(false);
 
   const [content, setContent] = useState("");
   const [customerLabel, setCustomerLabel] = useState("");
   const [channel, setChannel] = useState<Channel>("SUPPORT");
+  const [csvFile, setCsvFile] = useState<File | null>(null);
 
   const [search, setSearch] = useState("");
   const [filterChannel, setFilterChannel] = useState("");
@@ -139,6 +150,88 @@ export default function FeedbackTable() {
     }
   }
 
+  async function handleCsvUpload(e: FormEvent) {
+    e.preventDefault();
+    setMessage("");
+
+    if (!canManage) {
+      setMessage("Viewer role is read-only. Only Admin or Analyst can import CSV.");
+      return;
+    }
+
+    if (!csvFile) {
+      setMessage("Please choose a CSV file first.");
+      return;
+    }
+
+    try {
+      setImporting(true);
+
+      const formData = new FormData();
+      formData.append("file", csvFile);
+
+      const res = await fetch("/api/feedback/bulk", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setMessage(data.message || "CSV import failed.");
+        return;
+      }
+
+      setMessage(
+        `CSV import completed. Imported: ${data.imported || 0}, Failed: ${data.failed || 0}.`
+      );
+
+      setCsvFile(null);
+
+      const input = document.getElementById("csv-file-input") as HTMLInputElement | null;
+      if (input) input.value = "";
+
+      setPage(1);
+      fetchFeedbacks();
+    } catch {
+      setMessage("CSV import failed.");
+    } finally {
+      setImporting(false);
+    }
+  }
+
+  async function handleSimulatedImport() {
+    setMessage("");
+
+    if (!canManage) {
+      setMessage("Viewer role is read-only. Only Admin or Analyst can pull simulated feedback.");
+      return;
+    }
+
+    try {
+      setImporting(true);
+
+      const res = await fetch("/api/feedback/simulate", {
+        method: "POST",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setMessage(data.message || "Simulated channel import failed.");
+        return;
+      }
+
+      setMessage(`Simulated channel imported successfully. Imported: ${data.imported || 0}.`);
+      setPage(1);
+      fetchFeedbacks();
+    } catch {
+      setMessage("Simulated channel import failed.");
+    } finally {
+      setImporting(false);
+    }
+  }
+
   async function updateStatus(id: string, status: Status) {
     if (!canManage) {
       setMessage("Viewer role is read-only. Only Admin or Analyst can update status.");
@@ -212,8 +305,8 @@ export default function FeedbackTable() {
   }
 
   const roleText = useMemo(() => {
-    if (role === "ADMIN") return "Admin can add, update status, and delete feedback.";
-    if (role === "ANALYST") return "Analyst can add feedback and update status.";
+    if (role === "ADMIN") return "Admin can add, import, update status, and delete feedback.";
+    if (role === "ANALYST") return "Analyst can add, import, and update status.";
     return "Viewer can only read feedback.";
   }, [role]);
 
@@ -284,6 +377,68 @@ export default function FeedbackTable() {
 
       <section className="rounded-2xl border border-white/10 bg-[#111827] p-6">
         <div className="mb-5">
+          <h2 className="text-2xl font-bold text-white">Bulk Import & Simulated Source</h2>
+          <p className="mt-1 text-sm text-slate-400">
+            Upload CSV or pull demo feedback from a simulated channel source.
+          </p>
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-2">
+          <form
+            onSubmit={handleCsvUpload}
+            className="rounded-2xl border border-white/10 bg-slate-950 p-5"
+          >
+            <div className="mb-4 flex items-center gap-3">
+              <FileUp className="h-5 w-5 text-blue-400" />
+              <div>
+                <h3 className="font-semibold text-white">CSV Bulk Upload</h3>
+                <p className="text-xs text-slate-400">
+                  Header: content,channel,customerLabel,sourceRef
+                </p>
+              </div>
+            </div>
+
+            <input
+              id="csv-file-input"
+              type="file"
+              accept=".csv"
+              onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
+              className="mb-4 w-full rounded-xl border border-slate-700 bg-[#111827] px-4 py-3 text-sm text-white"
+            />
+
+            <button
+              type="submit"
+              disabled={!canManage || importing}
+              className="w-full rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {importing ? "Importing..." : "Upload CSV"}
+            </button>
+          </form>
+
+          <div className="rounded-2xl border border-white/10 bg-slate-950 p-5">
+            <div className="mb-4 flex items-center gap-3">
+              <Database className="h-5 w-5 text-emerald-400" />
+              <div>
+                <h3 className="font-semibold text-white">Simulated Channel Source</h3>
+                <p className="text-xs text-slate-400">
+                  Pull realistic support and app-store feedback samples.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={handleSimulatedImport}
+              disabled={!canManage || importing}
+              className="w-full rounded-xl bg-emerald-600 px-5 py-3 font-semibold text-white hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {importing ? "Importing..." : "Pull Simulated Feedback"}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-white/10 bg-[#111827] p-6">
+        <div className="mb-5">
           <h2 className="text-2xl font-bold text-white">Feedback Inbox</h2>
           <p className="mt-1 text-sm text-slate-400">
             Search, filter, paginate, and triage feedback.
@@ -308,7 +463,9 @@ export default function FeedbackTable() {
           >
             <option value="">All Channels</option>
             {channels.map((item) => (
-              <option key={item} value={item}>{item}</option>
+              <option key={item} value={item}>
+                {item}
+              </option>
             ))}
           </select>
 
@@ -319,7 +476,9 @@ export default function FeedbackTable() {
           >
             <option value="">All Sentiment</option>
             {sentiments.map((item) => (
-              <option key={item} value={item}>{item}</option>
+              <option key={item} value={item}>
+                {item}
+              </option>
             ))}
           </select>
 
@@ -330,7 +489,9 @@ export default function FeedbackTable() {
           >
             <option value="">All Status</option>
             {statuses.map((item) => (
-              <option key={item} value={item}>{item}</option>
+              <option key={item} value={item}>
+                {item}
+              </option>
             ))}
           </select>
 
