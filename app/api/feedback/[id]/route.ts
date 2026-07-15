@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
@@ -17,7 +19,7 @@ const updateFeedbackSchema = z.object({
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
     const currentUser = await getCurrentUser();
@@ -29,7 +31,7 @@ export async function GET(
       );
     }
 
-    const { id } = await params;
+    const { id } = params;
 
     const feedback = await prisma.feedback.findFirst({
       where: {
@@ -63,7 +65,7 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
     const currentUser = await getCurrentUser();
@@ -82,7 +84,7 @@ export async function PATCH(
       );
     }
 
-    const { id } = await params;
+    const { id } = params;
     const body = await req.json();
     const validatedData = updateFeedbackSchema.parse(body);
 
@@ -131,7 +133,7 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
     const currentUser = await getCurrentUser();
@@ -150,7 +152,7 @@ export async function DELETE(
       );
     }
 
-    const { id } = await params;
+    const { id } = params;
 
     const existingFeedback = await prisma.feedback.findFirst({
       where: {

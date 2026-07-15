@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { canManageFeedback, getCurrentUser } from "@/lib/auth";
@@ -6,7 +8,7 @@ import { storeFeedbackClassification } from "@/lib/ai/store-classification";
 
 export async function POST(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
     const currentUser = await getCurrentUser();
@@ -25,7 +27,7 @@ export async function POST(
       );
     }
 
-    const { id } = await params;
+    const { id } = params;
 
     const feedback = await prisma.feedback.findFirst({
       where: {

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import { FeedbackChannel, FeedbackStatus, Sentiment } from "@prisma/client";
 import { prisma } from "@/lib/db";
