@@ -1,43 +1,34 @@
 "use client";
 
 import { Bell, LogOut, Search } from "lucide-react";
+import { getSession, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import ThemeToggle from "../shared/ThemeToggle";
 
 export default function TopBar() {
-  const router = useRouter();
-
   const [user, setUser] = useState({
     name: "User",
-    role: "Admin",
+    role: "VIEWER",
   });
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("loopUser");
+    async function loadSession() {
+      const session = await getSession();
 
-    if (!savedUser) {
-      router.push("/login");
-      return;
+      if (session?.user) {
+        setUser({
+          name: session.user.name || "User",
+          role: (session.user as any).role || "VIEWER",
+        });
+      }
     }
 
-    const parsedUser = JSON.parse(savedUser);
-
-    setUser({
-      name: parsedUser.name || "User",
-      role: parsedUser.role || "Admin",
-    });
-  }, [router]);
-
-  function handleLogout() {
-    localStorage.removeItem("loopUser");
-    localStorage.removeItem("loopToken");
-    router.push("/login");
-  }
+    loadSession();
+  }, []);
 
   return (
-    <div className="mb-8 flex flex-col gap-4 rounded-2xl border border-white/10 bg-[#111827] px-4 py-4 shadow-lg lg:flex-row lg:items-center lg:justify-between lg:px-6">
-      <div className="flex w-full items-center gap-3 rounded-xl border border-slate-700 bg-[#020617] px-4 py-3 lg:w-[420px]">
+    <div className="mb-8 flex items-center justify-between rounded-2xl border border-white/10 bg-[#111827] px-6 py-4 shadow-lg">
+      <div className="flex w-[420px] items-center gap-3 rounded-xl border border-slate-700 bg-[#020617] px-4 py-3">
         <Search className="h-5 w-5 text-slate-400" />
 
         <input
@@ -46,7 +37,7 @@ export default function TopBar() {
         />
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex items-center gap-4">
         <button className="rounded-xl bg-slate-800 p-3 hover:bg-blue-600">
           <Bell className="h-5 w-5" />
         </button>
@@ -54,7 +45,7 @@ export default function TopBar() {
         <ThemeToggle />
 
         <button
-          onClick={handleLogout}
+          onClick={() => signOut({ callbackUrl: "/login" })}
           className="rounded-xl bg-red-500/20 p-3 text-red-400 hover:bg-red-600 hover:text-white"
           title="Logout"
         >

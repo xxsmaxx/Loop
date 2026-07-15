@@ -1,95 +1,89 @@
 "use client";
 
-import Link from "next/link";
-import { Sparkles } from "lucide-react";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 
 export default function LoginPage() {
   const router = useRouter();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("admin@loop.com");
+  const [password, setPassword] = useState("Demo@123");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  async function handleLogin(e: React.FormEvent) {
+  async function handleLogin(e: FormEvent) {
     e.preventDefault();
-    setMessage("Logging in...");
+    setMessage("");
+    setLoading(true);
 
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
+    const result = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
     });
 
-    const data = await res.json();
+    setLoading(false);
 
-    if (res.ok) {
-      localStorage.setItem("loopUser", JSON.stringify(data.user));
-      localStorage.setItem("loopToken", data.token);
-      setMessage("Login successful ✅");
-      router.push("/dashboard");
-    } else {
-      setMessage(data.message || "Login failed");
+    if (result?.error) {
+      setMessage("Invalid email or password.");
+      return;
     }
+
+    router.push("/dashboard");
+    router.refresh();
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#020617] px-6 text-white">
-      <div className="w-full max-w-[460px] rounded-3xl border border-white/10 bg-[#111827] p-8 shadow-2xl">
-        <div className="text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-500 to-purple-500">
-            <Sparkles className="h-7 w-7 text-white" />
-          </div>
-
-          <h1 className="mt-6 text-3xl font-bold">
-            Welcome back to LOOP
-          </h1>
-
-          <p className="mt-2 text-sm text-slate-400">
-            Login to continue your feedback dashboard.
+    <main className="flex min-h-screen items-center justify-center bg-[#020617] px-4 text-white">
+      <div className="w-full max-w-md rounded-3xl border border-white/10 bg-[#111827] p-8 shadow-2xl">
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-bold">LOOP</h1>
+          <p className="mt-2 text-slate-400">
+            Sign in to your Zidio demo workspace
           </p>
         </div>
 
-        <form onSubmit={handleLogin} className="mt-8 space-y-4">
+        {message && (
+          <div className="mb-5 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+            {message}
+          </div>
+        )}
+
+        <form onSubmit={handleLogin} className="space-y-4">
           <input
-            type="email"
-            placeholder="Email Address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500"
+            placeholder="Email"
+            type="email"
+            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none placeholder:text-slate-500"
+            required
           />
 
           <input
-            type="password"
-            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500"
+            placeholder="Password"
+            type="password"
+            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none placeholder:text-slate-500"
+            required
           />
 
           <button
             type="submit"
-            className="block w-full rounded-xl bg-blue-600 px-5 py-3 text-center text-sm font-semibold hover:bg-blue-500"
+            disabled={loading}
+            className="w-full rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-500 disabled:opacity-60"
           >
-            Login
+            {loading ? "Signing in..." : "Login"}
           </button>
         </form>
 
-        {message && (
-          <p className="mt-4 text-center text-sm text-blue-400">
-            {message}
-          </p>
-        )}
-
-        <p className="mt-6 text-center text-sm text-slate-400">
-          Don&apos;t have an account?{" "}
-          <Link href="/signup" className="text-blue-400 hover:text-blue-300">
-            Sign up
-          </Link>
-        </p>
+        <div className="mt-6 rounded-2xl bg-slate-950 p-4 text-sm text-slate-300">
+          <p className="font-semibold text-white">Demo Credentials</p>
+          <p className="mt-2">Admin: admin@loop.com / Demo@123</p>
+          <p>Analyst: analyst@loop.com / Demo@123</p>
+          <p>Viewer: viewer@loop.com / Demo@123</p>
+        </div>
       </div>
     </main>
   );
