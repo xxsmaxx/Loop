@@ -1,14 +1,26 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/mongodb";
-import { getCurrentUser } from "@/lib/auth";
-import Feedback from "@/models/Feedback";
+import { z } from "zod";
+import { prisma } from "@/lib/db";
+import { canManageFeedback, getCurrentUser } from "@/lib/auth";
+import { FeedbackChannel, FeedbackStatus, Sentiment } from "@prisma/client";
 
-export async function DELETE(
+const updateFeedbackSchema = z.object({
+  content: z.string().min(1).optional(),
+  channel: z.nativeEnum(FeedbackChannel).optional(),
+  customerLabel: z.string().optional(),
+  sourceRef: z.string().optional(),
+  sentiment: z.nativeEnum(Sentiment).optional(),
+  sentimentScore: z.number().min(-1).max(1).optional(),
+  status: z.nativeEnum(FeedbackStatus).optional(),
+  featureArea: z.string().optional(),
+});
+
+export async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const currentUser = await getCurrentUser(req);
+    const currentUser = await getCurrentUser();
 
     if (!currentUser) {
       return NextResponse.json(
@@ -17,33 +29,33 @@ export async function DELETE(
       );
     }
 
-    if (currentUser.role !== "Admin") {
-      return NextResponse.json(
-        { message: "Forbidden. Only admin can delete feedback." },
-        { status: 403 }
-      );
-    }
-
     const { id } = await params;
 
-    await connectDB();
+    const feedback = await prisma.feedback.findFirst({
+      where: {
+        id,
+        workspaceId: currentUser.workspaceId,
+      },
+      include: {
+        feedbackThemes: {
+          include: {
+            theme: true,
+          },
+        },
+      },
+    });
 
-    const deletedFeedback = await Feedback.findByIdAndDelete(id);
-
-    if (!deletedFeedback) {
+    if (!feedback) {
       return NextResponse.json(
-        { message: "Feedback not found" },
+        { message: "Feedback not found." },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(
-      { message: "Feedback deleted successfully" },
-      { status: 200 }
-    );
+    return NextResponse.json({ feedback }, { status: 200 });
   } catch (error: any) {
     return NextResponse.json(
-      { message: error.message || "Failed to delete feedback" },
+      { message: error.message || "Failed to fetch feedback." },
       { status: 500 }
     );
   }
@@ -54,7 +66,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const currentUser = await getCurrentUser(req);
+    const currentUser = await getCurrentUser();
 
     if (!currentUser) {
       return NextResponse.json(
@@ -63,41 +75,110 @@ export async function PATCH(
       );
     }
 
-    if (currentUser.role !== "Admin") {
+    if (!canManageFeedback(currentUser.role)) {
       return NextResponse.json(
-        { message: "Forbidden. Only admin can edit feedback." },
+        { message: "Forbidden. Only Admin or Analyst can update feedback." },
         { status: 403 }
       );
     }
 
     const { id } = await params;
-    const { company, customer, feedback, sentiment, status } = await req.json();
+    const body = await req.json();
+    const validatedData = updateFeedbackSchema.parse(body);
 
-    await connectDB();
+    const existingFeedback = await prisma.feedback.findFirst({
+      where: {
+        id,
+        workspaceId: currentUser.workspaceId,
+      },
+    });
 
-    const updatedFeedback = await Feedback.findByIdAndUpdate(
-      id,
-      { company, customer, feedback, sentiment, status },
-      { new: true }
-    );
-
-    if (!updatedFeedback) {
+    if (!existingFeedback) {
       return NextResponse.json(
-        { message: "Feedback not found" },
+        { message: "Feedback not found." },
         { status: 404 }
       );
     }
 
+    const feedback = await prisma.feedback.update({
+      where: { id },
+      data: validatedData,
+    });
+
     return NextResponse.json(
       {
-        message: "Feedback updated successfully",
-        feedback: updatedFeedback,
+        message: "Feedback updated successfully.",
+        feedback,
       },
       { status: 200 }
     );
   } catch (error: any) {
+    console.log("UPDATE_FEEDBACK_ERROR:", error);
+
+    if (error?.name === "ZodError") {
+      return NextResponse.json(
+        { message: "Validation failed.", errors: error.errors },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json(
-      { message: error.message || "Failed to update feedback" },
+      { message: error.message || "Failed to update feedback." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) {
+      return NextResponse.json(
+        { message: "Unauthorized. Please login again." },
+        { status: 401 }
+      );
+    }
+
+    if (currentUser.role !== "ADMIN") {
+      return NextResponse.json(
+        { message: "Forbidden. Only Admin can delete feedback." },
+        { status: 403 }
+      );
+    }
+
+    const { id } = await params;
+
+    const existingFeedback = await prisma.feedback.findFirst({
+      where: {
+        id,
+        workspaceId: currentUser.workspaceId,
+      },
+    });
+
+    if (!existingFeedback) {
+      return NextResponse.json(
+        { message: "Feedback not found." },
+        { status: 404 }
+      );
+    }
+
+    await prisma.feedback.delete({
+      where: { id },
+    });
+
+    return NextResponse.json(
+      { message: "Feedback deleted successfully." },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    console.log("DELETE_FEEDBACK_ERROR:", error);
+
+    return NextResponse.json(
+      { message: error.message || "Failed to delete feedback." },
       { status: 500 }
     );
   }

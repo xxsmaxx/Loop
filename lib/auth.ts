@@ -1,36 +1,22 @@
-import jwt from "jsonwebtoken";
-import { connectDB } from "@/lib/mongodb";
-import User from "@/models/User";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
 
-export async function getCurrentUser(req: Request) {
-  try {
-    const authHeader = req.headers.get("authorization");
-    const token = authHeader?.startsWith("Bearer ")
-      ? authHeader.split(" ")[1]
-      : null;
+export async function getCurrentUser() {
+  const session = await getServerSession(authOptions);
 
-    if (!token) return null;
-
-    const jwtSecret = process.env.JWT_SECRET;
-    if (!jwtSecret) return null;
-
-    const decoded = jwt.verify(token, jwtSecret) as {
-      id?: string;
-      email?: string;
-    };
-
-    await connectDB();
-
-    if (decoded.id) {
-      return await User.findById(decoded.id).select("-password");
-    }
-
-    if (decoded.email) {
-      return await User.findOne({ email: decoded.email }).select("-password");
-    }
-
-    return null;
-  } catch {
+  if (!session?.user) {
     return null;
   }
+
+  return {
+    id: (session.user as any).id as string,
+    name: session.user.name || "User",
+    email: session.user.email || "",
+    role: (session.user as any).role as "ADMIN" | "ANALYST" | "VIEWER",
+    workspaceId: (session.user as any).workspaceId as string,
+  };
+}
+
+export function canManageFeedback(role?: string) {
+  return role === "ADMIN" || role === "ANALYST";
 }
