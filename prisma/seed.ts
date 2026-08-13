@@ -1,4 +1,10 @@
-import { PrismaClient, FeedbackChannel, FeedbackStatus, Sentiment, Role } from "@prisma/client";
+import {
+  PrismaClient,
+  FeedbackChannel,
+  FeedbackStatus,
+  Sentiment,
+  Role,
+} from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -26,16 +32,59 @@ const channels = [
 ];
 
 const themes = [
-  { name: "Onboarding", description: "Signup, setup, and first-time user experience", color: "#3B82F6" },
-  { name: "Payments", description: "Checkout, billing, and payment failures", color: "#EF4444" },
-  { name: "Dashboard UX", description: "Dashboard usability and visual experience", color: "#22C55E" },
-  { name: "Support Quality", description: "Customer support response and resolution", color: "#F59E0B" },
-  { name: "Mobile Experience", description: "Mobile layout and responsiveness", color: "#8B5CF6" },
+  {
+    name: "Onboarding",
+    description: "Signup, setup, and first-time user experience",
+    color: "#3B82F6",
+  },
+  {
+    name: "Payments",
+    description: "Checkout, billing, and payment issues",
+    color: "#EF4444",
+  },
+  {
+    name: "Dashboard UX",
+    description: "Dashboard usability and visual experience",
+    color: "#22C55E",
+  },
+  {
+    name: "Support Quality",
+    description: "Customer support response and resolution",
+    color: "#F59E0B",
+  },
+  {
+    name: "Mobile Experience",
+    description: "Mobile layout and responsiveness",
+    color: "#8B5CF6",
+  },
 ];
 
+function getRequiredEnv(name: string) {
+  const value = process.env[name];
+
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+
+  return value;
+}
+
 async function main() {
-  const password = "Demo@123";
-  const passwordHash = await bcrypt.hash(password, 10);
+  const workspaceName =
+    process.env.SEED_WORKSPACE_NAME || "LOOP Customer Insights";
+
+  const adminEmail = getRequiredEnv("SEED_ADMIN_EMAIL").toLowerCase();
+  const adminPassword = getRequiredEnv("SEED_ADMIN_PASSWORD");
+
+  const analystEmail = getRequiredEnv("SEED_ANALYST_EMAIL").toLowerCase();
+  const analystPassword = getRequiredEnv("SEED_ANALYST_PASSWORD");
+
+  const viewerEmail = getRequiredEnv("SEED_VIEWER_EMAIL").toLowerCase();
+  const viewerPassword = getRequiredEnv("SEED_VIEWER_PASSWORD");
+
+  const adminPasswordHash = await bcrypt.hash(adminPassword, 10);
+  const analystPasswordHash = await bcrypt.hash(analystPassword, 10);
+  const viewerPasswordHash = await bcrypt.hash(viewerPassword, 10);
 
   await prisma.embedding.deleteMany();
   await prisma.feedbackTheme.deleteMany();
@@ -47,37 +96,38 @@ async function main() {
 
   const workspace = await prisma.workspace.create({
     data: {
-      name: "Zidio Demo Workspace",
+      name: workspaceName,
     },
   });
 
   const admin = await prisma.user.create({
     data: {
-      name: "Admin User",
-      email: "admin@loop.com",
-      passwordHash,
+      name: "Workspace Administrator",
+      email: adminEmail,
+      passwordHash: adminPasswordHash,
       role: Role.ADMIN,
       workspaceId: workspace.id,
     },
   });
 
-  await prisma.user.createMany({
-    data: [
-      {
-        name: "Analyst User",
-        email: "analyst@loop.com",
-        passwordHash,
-        role: Role.ANALYST,
-        workspaceId: workspace.id,
-      },
-      {
-        name: "Viewer User",
-        email: "viewer@loop.com",
-        passwordHash,
-        role: Role.VIEWER,
-        workspaceId: workspace.id,
-      },
-    ],
+  await prisma.user.create({
+    data: {
+      name: "Customer Insights Analyst",
+      email: analystEmail,
+      passwordHash: analystPasswordHash,
+      role: Role.ANALYST,
+      workspaceId: workspace.id,
+    },
+  });
+
+  await prisma.user.create({
+    data: {
+      name: "Insights Viewer",
+      email: viewerEmail,
+      passwordHash: viewerPasswordHash,
+      role: Role.VIEWER,
+      workspaceId: workspace.id,
+    },
   });
 
   const createdThemes = [];
@@ -99,14 +149,22 @@ async function main() {
     const theme = createdThemes[i % createdThemes.length];
 
     const sentiment =
-      i % 3 === 0 ? Sentiment.NEG : i % 3 === 1 ? Sentiment.POS : Sentiment.NEU;
+      i % 3 === 0
+        ? Sentiment.NEG
+        : i % 3 === 1
+          ? Sentiment.POS
+          : Sentiment.NEU;
 
     const sentimentScore =
-      sentiment === Sentiment.POS ? 0.72 : sentiment === Sentiment.NEG ? -0.65 : 0.05;
+      sentiment === Sentiment.POS
+        ? 0.72
+        : sentiment === Sentiment.NEG
+          ? -0.65
+          : 0.05;
 
     const feedback = await prisma.feedback.create({
       data: {
-        content: `${text} Feedback sample #${i}`,
+        content: `${text} Customer feedback reference #${i}`,
         channel,
         sourceRef: `${channel.toLowerCase()}-${i}`,
         customerLabel: `Customer ${i}`,
@@ -116,8 +174,8 @@ async function main() {
           i % 4 === 0
             ? FeedbackStatus.REVIEWED
             : i % 5 === 0
-            ? FeedbackStatus.ACTIONED
-            : FeedbackStatus.NEW,
+              ? FeedbackStatus.ACTIONED
+              : FeedbackStatus.NEW,
         featureArea: theme.name,
         workspaceId: workspace.id,
       },
@@ -142,16 +200,19 @@ async function main() {
   await prisma.report.create({
     data: {
       title: "Weekly Voice of Customer Report",
-      periodStart: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+      periodStart: new Date(
+        Date.now() - 7 * 24 * 60 * 60 * 1000
+      ),
       periodEnd: new Date(),
       contentJson: {
         summary:
-          "Customers are mainly discussing onboarding, payments, dashboard UX, support quality, and mobile experience.",
+          "Customer feedback is mainly focused on onboarding, payments, dashboard usability, support quality, and mobile experience.",
         topThemes: themes.map((theme) => theme.name),
         recommendedActions: [
-          "Improve onboarding flow",
-          "Fix payment retry issues",
-          "Polish mobile dashboard layout",
+          "Improve the onboarding flow",
+          "Reduce payment retry failures",
+          "Improve mobile dashboard responsiveness",
+          "Improve support response time",
         ],
       },
       workspaceId: workspace.id,
@@ -159,16 +220,17 @@ async function main() {
     },
   });
 
-  console.log("Seed completed successfully.");
-  console.log("Demo credentials:");
-  console.log("Admin: admin@loop.com / Demo@123");
-  console.log("Analyst: analyst@loop.com / Demo@123");
-  console.log("Viewer: viewer@loop.com / Demo@123");
+  console.log("Database seed completed successfully.");
+  console.log(`Workspace: ${workspace.name}`);
+  console.log("Initial role-based users created successfully.");
+  console.log("Feedback records created: 120");
+  console.log(`Themes created: ${themes.length}`);
+  console.log("Initial report created successfully.");
 }
 
 main()
   .catch((error) => {
-    console.error(error);
+    console.error("Database seed failed:", error);
     process.exit(1);
   })
   .finally(async () => {

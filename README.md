@@ -31,20 +31,9 @@ Project LOOP is an AI-powered customer feedback intelligence platform built for 
 - Voice of Customer report generation
 - Saved reports and TXT export
 
-## Demo Credentials
+## Authentication
 
-Admin:
-admin@loop.com
-Password: Demo@123
-
-Analyst:
-analyst@loop.com
-Password: Demo@123
-
-Viewer:
-viewer@loop.com
-Password: Demo@123
-
+Create a new account from the Sign Up page and use those credentials to log in.
 ## Environment Variables
 
 Create a .env file.
